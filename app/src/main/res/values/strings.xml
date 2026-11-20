@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Interview Prep</string>
+
+    <string name="header_label">DAYS UNTIL INTERVIEW</string>
+    <string name="unit_days">days remaining</string>
+    <string name="label_target_date">Target date</string>
+    <string name="label_cards_mastered">Cards mastered</string>
+    <string name="section_card">FLASHCARD</string>
+
+    <string name="btn_prev">Prev</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_reveal_show">Reveal</string>
+    <string name="btn_reveal_hide">Hide</string>
+    <string name="btn_mark_mastered">Mark as mastered</string>
+    <string name="btn_marked">Mastered ✓</string>
+
+    <string name="hint_swipe">Swipe the card left or right to move between questions</string>
+</resources>
