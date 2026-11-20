@@ -32,33 +32,30 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # Tee the build output so a failure is debuggable even when the hosted
-      # log viewer truncates it.
       - name: Build debug APK
         id: build
         run: |
           set +e
-          ./gradlew assembleDebug --stacktrace --no-daemon 2>&1 | tee build.log
-          STATUS=${PIPESTATUS[0]}
-          echo "gradle exit status: $STATUS"
+          ./gradlew assembleDebug --stacktrace --no-daemon > "$RUNNER_TEMP/build.log" 2>&1
+          STATUS=$?
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
-          echo "=== errors ==="
-          grep -n -E "^e: |error:|FAILURE|What went wrong" -A3 build.log | head -60 || true
+          echo "gradle exit status: $STATUS"
+          tail -80 "$RUNNER_TEMP/build.log"
           exit $STATUS
 
-      # Republish the raw log onto a throwaway branch so it can be read without
-      # authentication when the run page truncates it.
-      - name: Publish build log
-        if: always()
-        continue-on-error: true
+      # On failure, publish the log to a branch so it is readable without
+      # downloading artifacts. The log is copied out of the workspace first,
+      # because the orphan-branch checkout empties the working tree.
+      - name: Publish build log on failure
+        if: failure()
         run: |
+          cp "$RUNNER_TEMP/build.log" /tmp/build.log
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git checkout --orphan ci_logs_tmp
           git rm -rf --cached . >/dev/null 2>&1 || true
           find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
-          cp "$GITHUB_WORKSPACE/build.log" . 2>/dev/null || true
-          ls -la
+          cp /tmp/build.log ./build.log
           git add -A
           git commit -m "build log for run ${{ github.run_number }}"
           git push -f origin ci_logs_tmp:build-logs
