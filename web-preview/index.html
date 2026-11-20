@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1E3A5F">
+<title>Interview Prep</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+    background: #F5F6F8;
+    color: #1A1A1A;
+    overscroll-behavior: none;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100%;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .app {
+    width: 100%;
+    max-width: 440px;
+    padding: 20px;
+    padding-bottom: 40px;
+  }
+
+  /* ---------- countdown card ---------- */
+  .card-dark {
+    background: #1E3A5F;
+    border-radius: 18px;
+    padding: 20px;
+    color: #fff;
+  }
+
+  .header-label {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: #B8C6D9;
+    text-transform: uppercase;
+  }
+
+  .countdown {
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1.05;
+    margin-top: 6px;
+  }
+
+  .unit {
+    font-size: 13px;
+    color: #B8C6D9;
+  }
+
+  .divider {
+    height: 1px;
+    background: #33465F;
+    margin: 14px 0;
+  }
+
+  .stats {
+    display: flex;
+    gap: 12px;
+  }
+
+  .stat {
+    flex: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #8E9EB2;
+  }
+
+  .stat-value {
+    font-size: 14px;
+    margin-top: 3px;
+    color: #fff;
+  }
+
+  .stat-value.gold {
+    color: #C9A227;
+    font-weight: 700;
+  }
+
+  /* ---------- section label ---------- */
+  .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E3A5F;
+    letter-spacing: 0.06em;
+    margin: 22px 0 10px;
+    text-transform: uppercase;
+  }
+
+  /* ---------- flashcard ---------- */
+  .card-light {
+    background: #fff;
+    border: 1px solid #E3E7EC;
+    border-radius: 18px;
+    padding: 22px;
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .card-light.swipe-left  { transform: translateX(-24px); opacity: 0; }
+  .card-light.swipe-right { transform: translateX(24px);  opacity: 0; }
+
+  .tag {
+    align-self: flex-start;
+    font-size: 11px;
+    color: #1E3A5F;
+    background: #EDF1F6;
+    border-radius: 8px;
+    padding: 4px 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .question {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.45;
+    margin-top: 14px;
+  }
+
+  .answer {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #4A5568;
+    margin-top: 12px;
+    flex: 1;
+  }
+
+  .answer.hidden {
+    visibility: hidden;
+  }
+
+  /* ---------- controls ---------- */
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 15px;
+    border: none;
+    border-radius: 12px;
+    height: 52px;
+    cursor: pointer;
+    transition: opacity 0.12s ease, transform 0.08s ease;
+  }
+
+  button:active {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+
+  .btn-outline {
+    background: #fff;
+    border: 1.5px solid #1E3A5F;
+    color: #1E3A5F;
+  }
+
+  .btn-solid {
+    background: #1E3A5F;
+    color: #fff;
+    flex: 1.4;
+  }
+
+  .btn-flex { flex: 1; }
+
+  .btn-full {
+    width: 100%;
+    margin-top: 10px;
+    background: #fff;
+    border: 1.5px solid #1E3A5F;
+    color: #1E3A5F;
+  }
+
+  .btn-full.mastered {
+    border-color: #C9A227;
+    color: #C9A227;
+  }
+
+  /* ---------- progress ---------- */
+  .progress-track {
+    height: 6px;
+    background: #E3E7EC;
+    border-radius: 3px;
+    margin-top: 18px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #C9A227;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .hint {
+    text-align: center;
+    font-size: 11px;
+    color: #8E9EB2;
+    margin-top: 14px;
+  }
+
+  /* ---------- iOS notice ---------- */
+  .notice {
+    margin-top: 26px;
+    padding: 14px 16px;
+    background: #FFF8E1;
+    border: 1px solid #F0DFA8;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.65;
+    color: #6B5A1E;
+  }
+
+  .notice strong { color: #1E3A5F; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- countdown -->
+  <div class="card-dark">
+    <div class="header-label">Days until interview</div>
+    <div class="countdown" id="countdown">--</div>
+    <div class="unit">days remaining</div>
+
+    <div class="divider"></div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Target date</div>
+        <div class="stat-value" id="targetDate">--</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Cards mastered</div>
+        <div class="stat-value gold" id="masteredCount">0 / 0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Flashcard</div>
+
+  <!-- card -->
+  <div class="card-light" id="card">
+    <div class="tag" id="tag">--</div>
+    <div class="question" id="question">--</div>
+    <div class="answer hidden" id="answer">--</div>
+  </div>
+
+  <!-- controls -->
+  <div class="controls">
+    <button class="btn-outline btn-flex" id="prev">Prev</button>
+    <button class="btn-solid" id="reveal">Reveal</button>
+    <button class="btn-outline btn-flex" id="next">Next</button>
+  </div>
+
+  <button class="btn-full" id="masterBtn">Mark as mastered</button>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="hint">Swipe the card left or right to move between questions</div>
+
+  <div class="notice">
+    <strong>This is the web preview.</strong> It mirrors the Android app's
+    interface and behaviour exactly, so it can be tried on an iPhone where an
+    <code>.apk</code> cannot be installed. The Android build produced by the
+    pipeline is the actual deliverable.
+  </div>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------- deck data
+// Mirrors Deck.kt in the Android project.
+const DECK = [
+  {
+    tag: "SCHOOL",
+    q: "Which school do you prefer?",
+    a: "I lean towards UTC. Its strong focus on system engineering aligns with my Electronic Information background. However, I would be truly honoured to be accepted by either school."
+  },
+  {
+    tag: "SCHOOL",
+    q: "Why UTC and not UTT?",
+    a: "Two reasons. UTC's system engineering focus matches my project experience — on the Siemens Cup line I had to connect hardware, PLC and HMI into one working system. Second, project-based training suits how I learn: I understand principles by building and debugging."
+  },
+  {
+    tag: "SCHOOL",
+    q: "What is the difference between UTT and UTC?",
+    a: "Both are top-tier engineering schools within the UT group. UTC is known for comprehensive engineering and system engineering, while UTT has distinct advantages in digital systems. Both are highly relevant to my major in Electronic Information."
+  },
+  {
+    tag: "SCHOOL",
+    q: "Would you accept UTT if you are assigned there?",
+    a: "Yes, absolutely. Both schools share the same UT engineering training model, and UTT's digital systems fit my major well. I would be glad to go there."
+  },
+  {
+    tag: "RESEARCH",
+    q: "Which research direction interests you most?",
+    a: "My project experience is in automation and system integration — PLC, HMI and communication. That is the direction I want to continue in."
+  },
+  {
+    tag: "PROGRAMME",
+    q: "What do you know about UTT's programme?",
+    a: "I know UTT has strengths in digital systems and ICT, which match my major. I would be glad to learn more about its programme."
+  },
+  {
+    tag: "MOTIVATION",
+    q: "You are a first-year master's student. Why apply for an engineering degree now?",
+    a: "My current programme is mainly coursework-based. What I want is systematic engineering training with real projects and company experience — that is the French engineering model."
+  },
+  {
+    tag: "LANGUAGE",
+    q: "How is your English and French?",
+    a: "CET-6, and I can read English technical documentation on my own. My French is at the beginner stage; I plan to start before enrolment."
+  },
+  {
+    tag: "PROJECT",
+    q: "Tell me about the Siemens Cup project.",
+    a: "We built an unmanned production line on S7-1200 PLCs over PROFINET, linking six stations into one automated material flow. I developed and commissioned the WinCC HMI — I/O and tag planning, PLC signal acquisition, live line status, and tiered fault alarms. We won 2nd Prize in 2024."
+  },
+  {
+    tag: "PROJECT",
+    q: "What was the hardest part of that project?",
+    a: "Isolating signal-chain faults. A symptom on the HMI could originate in the hardware wiring, the PROFINET network, or the HMI configuration. I debugged in three layers to narrow it down instead of guessing."
+  },
+  {
+    tag: "BACKUP",
+    q: "Sorry, could you repeat the question?",
+    a: "Use this when you did not catch the question. Do not guess — ask. A calm request to repeat reads as attentive, not as weak English."
+  },
+  {
+    tag: "BACKUP",
+    q: "Sorry, I am not very familiar with that. Could I answer it from what I have done?",
+    a: "The escape line for a question you cannot answer. Then pivot to your Siemens Cup project and stop talking after one or two sentences."
+  }
+];
+
+// Same date as Deck.kt
+const INTERVIEW = new Date(2026, 11, 15); // month is 0-based → December 15
+
+// ---------------------------------------------------------------- state
+let index = 0;
+let answerVisible = false;
+let mastered = new Set();
+
+const $ = id => document.getElementById(id);
+
+// ---------------------------------------------------------------- countdown
+function renderCountdown() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(INTERVIEW);
+  target.setHours(0, 0, 0, 0);
+
+  const days = Math.round((target - today) / 86400000);
+  $('countdown').textContent = days > 0 ? days : (days === 0 ? '0' : '—');
+
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  $('targetDate').textContent = `${target.getDate()} ${months[target.getMonth()]} ${target.getFullYear()}`;
+}
+
+// ---------------------------------------------------------------- rendering
+function renderCard() {
+  const card = DECK[index];
+  $('tag').textContent = card.tag;
+  $('question').textContent = card.q;
+  $('answer').textContent = card.a;
+  $('answer').classList.toggle('hidden', !answerVisible);
+  $('reveal').textContent = answerVisible ? 'Hide' : 'Reveal';
+  renderMastered();
+  renderProgress();
+}
+
+function renderMastered() {
+  const isMastered = mastered.has(index);
+  const btn = $('masterBtn');
+  btn.textContent = isMastered ? 'Mastered ✓' : 'Mark as mastered';
+  btn.classList.toggle('mastered', isMastered);
+}
+
+function renderProgress() {
+  $('masteredCount').textContent = `${mastered.size} / ${DECK.length}`;
+  $('progressFill').style.width = (mastered.size / DECK.length * 100) + '%';
+}
+
+// ---------------------------------------------------------------- navigation
+function goTo(target) {
+  let next = target;
+  if (next < 0) next = DECK.length - 1;
+  if (next >= DECK.length) next = 0;
+
+  const card = $('card');
+  const direction = target > index ? 'swipe-left' : 'swipe-right';
+  card.classList.add(direction);
+
+  setTimeout(() => {
+    index = next;
+    answerVisible = false;
+    renderCard();
+    card.classList.remove(direction);
+  }, 170);
+}
+
+// ---------------------------------------------------------------- events
+$('prev').addEventListener('click', () => goTo(index - 1));
+$('next').addEventListener('click', () => goTo(index + 1));
+
+$('reveal').addEventListener('click', () => {
+  answerVisible = !answerVisible;
+  renderCard();
+});
+
+$('masterBtn').addEventListener('click', () => {
+  if (mastered.has(index)) mastered.delete(index);
+  else mastered.add(index);
+  saveMastered();
+  renderMastered();
+  renderProgress();
+});
+
+// swipe support
+let touchStartX = 0;
+let touchStartY = 0;
+
+$('card').addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+$('card').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].screenX - touchStartX;
+  const dy = e.changedTouches[0].screenY - touchStartY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+    goTo(dx < 0 ? index + 1 : index - 1);
+  }
+}, { passive: true });
+
+// keyboard support (convenient when testing on a desktop)
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') goTo(index + 1);
+  if (e.key === 'ArrowLeft') goTo(index - 1);
+  if (e.key === ' ') { e.preventDefault(); answerVisible = !answerVisible; renderCard(); }
+});
+
+// ---------------------------------------------------------------- persistence
+function saveMastered() {
+  try {
+    localStorage.setItem('interviewPrepMastered', JSON.stringify([...mastered]));
+  } catch (e) { /* storage unavailable */ }
+}
+
+function loadMastered() {
+  try {
+    const raw = localStorage.getItem('interviewPrepMastered');
+    if (raw) mastered = new Set(JSON.parse(raw));
+  } catch (e) { /* ignore */ }
+}
+
+// ---------------------------------------------------------------- init
+loadMastered();
+renderCountdown();
+renderCard();
+</script>
+</body>
+</html>
